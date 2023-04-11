@@ -1,43 +1,51 @@
-import {React, useState, useEffect} from 'react';
+import React, { useState} from 'react';
 import { PokemonCard } from '../components/PokemonCard';
-import { Row, Col } from 'react-bootstrap';
-import { Form, InputGroup } from 'react-bootstrap';
 
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
-export default function Home (props) {
-    console.log(props.pokemon)
+function Home({pokemon, pokemonFilteredList, setPokemonFilteredList}) {
 
-    const [pokemonToDisplay, setPokemonToDisplay] = useState(props.pokemon)
+  function handleChange(e) {
+    const value = e.target.value;
+    const regex = new RegExp(value, 'gi');
+    const filtered = pokemon.filter((pokemon) => {
+      return pokemon.name.match(regex);
+    });
+    setPokemonFilteredList(filtered);
+    // console.log(pokemonFilteredList)
+  }
 
-    useEffect(() => {
-        setPokemonToDisplay(props.pokemon)
-    }, [props.pokemon])
+  return (
+    <div data-testid="app">
+        {/* <h2 className='text-center'>Start Searching to select a Pokemon!</h2> */}
+      <InputGroup onChange={handleChange} className="mb-3 w-50 mx-auto">
+      <InputGroup.Text id="basic-addon1">Search Pokemon Name:</InputGroup.Text>
+        <Form.Control
+          placeholder="Search"
+          aria-label="search"
+          aria-describedby="basic-addon1"
+        />
+      </InputGroup>
+      <Container>
+        <Row md={4}>
+          {pokemonFilteredList.map((pokemon, idx) => (
+            <Col key={idx} className="mt-4" md="3" >
+              <PokemonCard
+                pokemonFilteredList={pokemonFilteredList}
+                key={idx}
+                name={pokemon.name}
+                url={pokemon.url}
+              />
+            </Col>
+          ))}
+        </Row>
+      </Container>
+    </div>
+  );
+}
 
-    const handleChange = (e) => {
-        const value = e.target.value.toLowerCase();
-        const relevantPokemon = props.pokemon.filter((onePokemon) => {
-          return onePokemon.name.toLowerCase().includes(value) || onePokemon.name.toLowerCase() === value;
-        })
-        setPokemonToDisplay(relevantPokemon);
-      }
-      return (
-        <>
-        <InputGroup className="mb-3">
-            <Form.Control
-            aria-label="Default"
-            onChange={(event) => {handleChange(event)}}
-            />
-        </InputGroup>
-            <h1>Pokemon should appear here</h1>
-            <Row className='g-4'>
-                {pokemonToDisplay.map((item, index) => {
-                    return (
-                        <Col xs={3}>
-                            <PokemonCard key={index} pokemonObject={item}/>
-                        </Col>
-                    )
-                })}
-            </Row>
-        </>
-      )
-};
+export { Home };
