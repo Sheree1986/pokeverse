@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { Navigation } from './components/Navigation';
 import { PokemonCard } from './components/PokemonCard';
 import { Container, Col, Form, InputGroup, Row } from "react-bootstrap";
-
+//git checkout -b adds-react-router
 const LIMIT = 150;
 const pokeApi = `https://pokeapi.co/api/v2/pokemon/?limit=${LIMIT}`;
 
