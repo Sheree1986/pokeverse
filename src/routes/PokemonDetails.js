@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
 import { useParams }  from "react-router-dom";
 
-const getPokemonDetails = async (name) => {
-    const pokemonUrl = `https://pokeapi.co/api/v2/pokemon/${name}`;
-    const res = await fetch(pokemonUrl);
-    const data = await res.json();
-    console.log(data);
-    return data;
-}
 
-export default function PokemonDetails(props) {
+    function PokemonDetails() {
+
     const params = useParams();
-    const [pokemon, setPokemon] = useState(null);
+     [pokemon, setPokemon] = useState(null);
     
     useEffect(() => {
-        try {
-            getPokemonDetails(params.name).then(details => {
-                setPokemon(details);
-            });
-        } catch (error) {
-            throw new Error(error);
-        }
-    }, [])
+    const fetchAPokemon = async () => {
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${params.name}`);
+    const data = await res.json();
+    setPokemon(data);
+    console.log(pokemon);
+
+  }
+    fetchAPokemon()
+ 
+    }, []);
+
     
     if (!pokemon) {
         return <>loading...</>
@@ -66,3 +63,4 @@ export default function PokemonDetails(props) {
 
     );
 }
+export { PokemonDetails }

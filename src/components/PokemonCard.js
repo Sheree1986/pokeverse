@@ -1,98 +1,63 @@
-// import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import Card from "react-bootstrap/Card";
-
-
-// function PokemonCard({ url, name, pokeList }) {
-
-//   const [pokemon, setPokemon] = useState(null);
-  
-
-//   useEffect(() => {
-//     fetch(url)
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setPokemon(data);
-       
-//       })
-//       .catch((error) => {
-//         console.log("Pokemon not found", error);
-//       });
-//   }, [url]);
-//   const navigateToPokemonCard = () => {
-//     navigate(name);
-//   };
-
-//   return (
-//     <>
-     
-//       <Card style={{ width: "18rem", height: "100%" }}>
-//         <Card.Img variant="top" src={pokemon?.sprites.front_default} />
-//         <Card.Body>
-//           <Card.Title>{name}</Card.Title>
-//           <Card.Text as="div">
-//           <p>Abilities:</p>
-//             {pokemon?.abilities.map((pokeAbility) => (
-          
-//               <ul>
-               
-//                 <li>{pokeAbility.ability.name}</li>
-//               </ul>
-//             ))}
-//           </Card.Text>
-//         </Card.Body>
-//       </Card>
-  
-//     </>
-//   );
-// }
-
-// export { PokemonCard };
-import React from 'react';
-import { Card } from 'react-bootstrap';
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
-const getSinglePokemon = async (url) => {
+import { FavoritesContext } from './FavoritesProvider';
 
-  try {
-    const response = await fetch(url);
-    const json = await response.json();
-    return json;
-  } catch (error) {
-      throw new Error(error);
-  }
-}
 
-function PokemonCard(props) {
-  const [singlePokemonInfo, setSinglePokemonInfo] = useState();
-  const pokemon = props.pokemonObject;
+function PokemonCard({ url, name, pokemonFilteredList }) {
+
+  const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
+
+  const [pokemon, setPokemon] = useState(null);
+
+  const fetchPokemon = async () => {
+    const res = await fetch(url);
+    const data = await res.json();
+    setPokemon(data);
+    // console.log(pokemon)
+  };
 
   useEffect(() => {
-      getSinglePokemon(pokemon.url).then((pokemonInfo) => {
-        setSinglePokemonInfo(pokemonInfo);
-      }).catch( error => {throw new Error(error)})
-  })
-  
-  if (singlePokemonInfo) {
-  return (
-    <Card>
-      <Card.Img src={singlePokemonInfo.sprites.front_default}></Card.Img>
-      <Link to={`/${singlePokemonInfo.name}`}>
-        <Card.Title>{singlePokemonInfo.name}</Card.Title>
-      </Link>
-      <p>Abilities:</p>
-     {singlePokemonInfo.abilities.map((ability) => {
-      
-         return  (<ul><li><Card.Text>{ability.ability.name}</Card.Text></li></ul>)
+    fetchPokemon();
+  }, [pokemonFilteredList]);
 
-         
-      
-      })} 
-      
-    </Card>
+  return (
+    <>
+      {pokemon ? (
+        <Card className="w-100 h-100 div-card"  >
+          <Card.Img src={`${pokemon.sprites.front_default}`}></Card.Img>
+          <Card.Body>
+            <Card.Title >      
+              <Link to={`/${name}`} style={{color: "black"}}>
+                {name.charAt(0).toUpperCase() + name.slice(1)}
+              </Link>
+              {/* {pokemon.name} */}
+            </Card.Title>
+            <Card.Text as={"div"}>
+              <ul>
+                {pokemon.abilities.map((pokemonAbility, idx) => (
+                  <li key={idx}>{pokemonAbility.ability.name}</li>
+                ))}
+              </ul>
+            </Card.Text>
+            {isFavorite(name) ? (
+            <Button onClick={() => removeFavorite(name)} variant="danger">
+              Remove from Favorites
+            </Button>
+          ) : (
+            <Button onClick={() => addFavorite({ name, url })}>
+              Add to Favorites
+            </Button>
+          )}
+          </Card.Body>
+        </Card>
+      ) : (
+        ""
+      )}
+    </>
   );
-}
 }
 
 export { PokemonCard };
