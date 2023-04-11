@@ -1,40 +1,43 @@
-import React, {useState, useEffect} from 'react';
-import { Navigation } from './components/Navigation';
-import { PokemonCard } from './components/PokemonCard';
-import { Container, Col, Form, InputGroup, Row } from "react-bootstrap";
-//git checkout -b adds-react-router
-const LIMIT = 150;
-const pokeApi = `https://pokeapi.co/api/v2/pokemon/?limit=${LIMIT}`;
+// import React, {useState, useEffect} from 'react';
+// import { Navigation } from './components/Navigation';
+// // import { PokemonCard } from './components/PokemonCard';
+// // import { Container, Col, Form, InputGroup, Row } from "react-bootstrap";
+// import { Home } from './routes/Home';
+// import { PokemonDetails } from './routes/PokemonDetails';
+// import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-function App() {
-  const [pokeCards, setPokeCards] = useState([]);
-  const [pokeList, setPokeList] = useState([]);
+// const LIMIT = 150;
+// const pokeApi = `https://pokeapi.co/api/v2/pokemon/?limit=${LIMIT}`;
+
+// // function App() {
+//   const [pokeCards, setPokeCards] = useState([]);
+//   const [pokeList, setPokeList] = useState([]);
 
 
-  useEffect(() => {
-    fetch(pokeApi)
-    .then((res) => res.json())
-    .then((data) => {
-      setPokeCards(data.results);
-    })
-    .catch((error) => {
-      console.log("Pokemon not found", error)
-  });
-}, []);
-handleChange = (event) => {
-  const value = event.target.value;
-  const regex = new RegExp(value, "gi");
-  const filtered = pokeCards.filter((pokemon) => {
-    return pokemon.name.match(regex);
-  });
+//   useEffect(() => {
+//     fetch(pokeApi)
+//     .then((res) => res.json())
+//     .then((data) => {
+//       setPokeCards(data.results);
+//     })
+//     .catch((error) => {
+//       console.log("Pokemon not found", error)
+//   });
+// }, []);
+// handleChange = (event) => {
+//   const value = event.target.value;
+//   const regex = new RegExp(value, "gi");
+//   const filtered = pokeCards.filter((pokemon) => {
+//     return pokemon.name.match(regex);
+//   });
 
-  setPokeList(filtered);
-};
-  return (
-    <div data-testid="app">
-      <Navigation />
+//   setPokeList(filtered);
+// };
+  // return (
+  //   <div data-testid="app">
+  //     <Navigation />
 
-      <center><h1>Pokemon should appear here</h1></center>
+      {/* <center><h1>Pokemon should appear here</h1></center>
  
       <Container>
         <InputGroup size="sm" className="mb-3">
@@ -62,8 +65,59 @@ handleChange = (event) => {
           ))}
         </Row>
      
-      </Container>
+      </Container> */}
+//             <BrowserRouter>
+//         <Routes>
+//           <Route path="/" element={<Home pokeCards={pokeCards} pokeList={pokeList} setPokeList={setPokeList}/>} />
+//           <Route path="/:name" element={<PokemonDetails />} />
+//         </Routes>
+//       </BrowserRouter>
+//     </div>
+//   );
+// // }
+
+// export { App };
+import {React, useState, useEffect} from 'react';
+import { Navigation } from './components/Navigation';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './routes/Home';
+import PokemonDetails from './routes/PokemonDetails';
+const LIMIT = 150;
+const pokeApi = `https://pokeapi.co/api/v2/pokemon/?limit=${LIMIT}`;
+
+const getPokemon = async () => {
+  try {
+  const res = await fetch(pokeApi);
+  const data = await res.json();
+  console.log(data)
+  return data.results;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+
+function App() {
+  const [pokemon, setPokemon] = useState([]);
+  
+  useEffect(() => {
+  getPokemon().then(items => {
+    setPokemon(items);
+  }).catch((error) => {
+    throw new Error(error);
+  });
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <div data-testid="app">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Home pokemon={pokemon}/>} />
+          <Route path="/:name" element={<PokemonDetails />} />
+        </Routes>
     </div>
+    </BrowserRouter>
   );
 }
 
